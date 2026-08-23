@@ -30,15 +30,19 @@ def _decode_domain(key: str) -> str | None:
     return None
 
 
+def _pk() -> str:
+    return _settings.clerk_publishable_key or _settings.vite_clerk_publishable_key
+
+
 def _issuer() -> str | None:
     if _settings.clerk_issuer:
         return _settings.clerk_issuer.rstrip("/")
-    domain = _decode_domain(_settings.clerk_publishable_key)
+    domain = _decode_domain(_pk())
     return f"https://{domain}" if domain else None
 
 
 CLERK_ENABLED = bool(
-    _settings.clerk_publishable_key or _settings.clerk_issuer or _settings.clerk_jwks_url
+    _pk() or _settings.clerk_issuer or _settings.clerk_jwks_url
 )
 
 _ISSUER = _issuer()

@@ -41,6 +41,7 @@ class Settings(BaseSettings):
     # postgresql://user:pass@host/db?sslmode=require
     database_url: str = ""
     clerk_publishable_key: str = ""
+    vite_clerk_publishable_key: str = ""
     clerk_secret_key: str = ""
     clerk_jwks_url: str = ""
     clerk_issuer: str = ""
