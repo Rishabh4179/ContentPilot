@@ -1,0 +1,84 @@
+# ==========================================
+# Environment & Secrets (NEVER COMMIT KEYS)
+# ==========================================
+.env
+.env.*
+!.env.example
+backend/.env
+frontend/.env
+frontend/.env.local
+
+# ==========================================
+# Dependencies
+# ==========================================
+node_modules/
+frontend/node_modules/
+.venv/
+venv/
+ENV/
+backend/.venv/
+backend/venv/
+
+# ==========================================
+# Databases & Local Media / Uploads
+# ==========================================
+*.db
+*.sqlite
+*.sqlite3
+backend/*.db
+backend/articleforge.db
+backend/covers/
+covers/
+
+# ==========================================
+# Build & Distribution Artifacts
+# ==========================================
+dist/
+build/
+frontend/dist/
+frontend/build/
+*.egg-info/
+.eggs/
+
+# ==========================================
+# Python Caches & Compiled Bytecode
+# ==========================================
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+
+# ==========================================
+# Logs & Temporary Files
+# ==========================================
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.tmp
+*.bak
+
+# ==========================================
+# IDE & Operating System Files
+# ==========================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.idea/
+*.suo
+*.user
+*.userosct
+*.sln.docstates

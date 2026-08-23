@@ -1,0 +1,14 @@
+fastapi>=0.115.0
+uvicorn[standard]>=0.30.6
+pydantic>=2.12.0
+pydantic-settings>=2.7.0
+python-dotenv>=1.0.1
+sqlmodel>=0.0.32
+pyjwt[crypto]>=2.9.0
+# openai client is used to call Gemini's OpenAI-compatible endpoint
+openai>=1.59.6
+# psycopg 3 driver for Postgres (Neon). db.py upgrades a bare
+# postgresql:// URL to postgresql+psycopg:// automatically.
+psycopg[binary]>=3.2.10
+# In-process scheduler for the weekly digest email job.
+APScheduler>=3.10.4
