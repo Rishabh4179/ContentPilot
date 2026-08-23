@@ -243,6 +243,7 @@ class AgentPlanResponse(BaseModel):
     reply: str
     actions: list[AgentAction] = Field(default_factory=list)
     clarification: "AgentClarification | None" = None
+    switch_to_article_id: int | None = None
     provider: str = ""
 
 

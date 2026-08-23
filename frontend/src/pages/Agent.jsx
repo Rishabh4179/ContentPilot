@@ -39,6 +39,18 @@ marked.setOptions({ breaks: true });
 
 const AGENT_NAME = "Pilot";
 
+function renderFormattedText(text) {
+  if (!text || typeof text !== "string") return text;
+  const parts = text.split(/(\*\*.*?\*\*)/g);
+  if (parts.length <= 1) return text;
+  return parts.map((part, idx) => {
+    if (part.startsWith("**") && part.endsWith("**") && part.length > 4) {
+      return <strong key={idx}>{part.slice(2, -2)}</strong>;
+    }
+    return part;
+  });
+}
+
 // Stable empty thread slice so renders don't churn when a thread is untouched.
 const EMPTY_THREAD = { activeId: null, messages: [], list: undefined };
 
@@ -880,13 +892,123 @@ export default function Agent() {
       return;
     }
     if (!selected) return;
+
+    let targetArticle = selected;
+    let switchNotice = "";
+
+    // Search ALL articles in the user's library to see if the query belongs to another article
+    if (articles.length > 0) {
+      const q = text.toLowerCase().trim();
+      const cleanQ = q
+        .replace(/^(switch to|open|load)\s+/i, "")
+        .replace(/^["']|["']$/g, "")
+        .replace(/\.$/, "")
+        .trim();
+      const qWords = cleanQ.split(/\W+/).filter((w) => w.length >= 2);
+
+      let bestMatch = null;
+      let highestScore = 0;
+
+      for (const a of articles) {
+        const title = (a.title || "").toLowerCase();
+        const topic = (a.topic || "").toLowerCase();
+        const keywords = (a.keywords || []).join(" ").toLowerCase();
+
+        let score = 0;
+
+        // Exact or strong phrase match in title or topic
+        if (cleanQ.length >= 3) {
+          if (title && (title === cleanQ || title.includes(cleanQ) || cleanQ.includes(title))) score += 50;
+          if (topic && (topic === cleanQ || topic.includes(cleanQ) || cleanQ.includes(topic))) score += 40;
+        }
+
+        // Word-level matching against title, topic, and keywords (avoids random body word false-positives)
+        for (const word of qWords) {
+          if (word.length < 3 && !["cjp", "ai", "seo", "ui", "ux", "db", "pdf"].includes(word)) continue;
+          if (title.includes(word)) score += 20;
+          else if (topic.includes(word)) score += 15;
+          else if (keywords.includes(word)) score += 12;
+        }
+
+        if (score >= 15 && score > highestScore) {
+          highestScore = score;
+          bestMatch = a;
+        }
+      }
+
+      const isToolCommand = [
+        "edit", "rewrite", "improve", "seo", "translate", "image", "images", "cover",
+        "social", "faq", "competitor", "competitors", "summary", "summarize", "proofread",
+        "export", "print", "pdf", "html", "word count", "title", "keyword", "keywords",
+        "heading", "section", "paragraph", "fix", "add", "remove", "change", "make", "takeaways", "tldr"
+      ].some((tool) => q.includes(tool));
+
+      if (bestMatch && bestMatch.id !== selectedId) {
+        // Automatically switch to the matched article!
+        pickArticle(bestMatch.id);
+        targetArticle = bestMatch;
+        switchNotice = `Switched to **${bestMatch.title || bestMatch.topic}**.\n\n`;
+      } else if (!bestMatch && !isToolCommand) {
+        // Out-of-the-box query: not in current article and not in any library article.
+        // Respond instantly locally with 0 API tokens and 0 latency!
+        const threadKey = libraryMode ? "library:0" : `agent:${selected.id}`;
+        setSessionState((prev) => {
+          const cur = prev[threadKey] || { activeId: null, messages: [], list: undefined };
+          return {
+            ...prev,
+            [threadKey]: {
+              ...cur,
+              messages: [
+                ...(cur.messages || []),
+                { role: "user", content: text },
+                {
+                  role: "assistant",
+                  content: `That topic is not mentioned in any article in your library. Please ask a question related to your articles, or generate a new article in the Generator.`,
+                },
+              ],
+            },
+          };
+        });
+        setInput("");
+        return;
+      }
+    }
+
+    let targetThreadKey = libraryMode ? "library:0" : `agent:${targetArticle.id}`;
+    const pushMsgToThread = (threadKey, msg) => {
+      setSessionState((prev) => {
+        const cur = prev[threadKey] || { activeId: null, messages: [], list: undefined };
+        return {
+          ...prev,
+          [threadKey]: {
+            ...cur,
+            messages: [...(cur.messages || []), msg],
+          },
+        };
+      });
+    };
+
+    const targetExistingMsgs = sessionState[targetThreadKey]?.messages || [];
     const nextMessages = [
-      ...messages.filter((m) => m.role === "user" || m.role === "assistant"),
+      ...targetExistingMsgs.filter((m) => m.role === "user" || m.role === "assistant"),
       { role: "user", content: text },
     ];
-    setMessages((prev) => [...prev, { role: "user", content: text }]);
+
+    pushMsgToThread(targetThreadKey, { role: "user", content: text });
     setInput("");
     setChatLoading(true);
+
+    // Ensure full targetArticle markdown is loaded for the planner
+    if (targetArticle && !targetArticle.markdown && targetArticle.id) {
+      try {
+        const fullArticle = await getArticle(targetArticle.id);
+        if (fullArticle?.markdown) {
+          targetArticle = fullArticle;
+        }
+      } catch {
+        /* ignore fetch error */
+      }
+    }
     try {
       const libraryRecent = articles.slice(0, 15).map((a) => ({
         id: a.id,
@@ -896,17 +1018,44 @@ export default function Agent() {
         created_at: a.created_at || "",
       }));
       const plan = await planAgentActions({
-        title: selected.title,
-        meta_description: selected.meta_description,
-        markdown: selected.markdown,
-        topic: selected.topic || selected.title,
-        keywords: selected.keywords || [],
-        tone: selected.tone || "informative",
-        audience: selected.audience || "a general audience",
+        title: targetArticle.title,
+        meta_description: targetArticle.meta_description,
+        markdown: targetArticle.markdown,
+        topic: targetArticle.topic || targetArticle.title,
+        keywords: targetArticle.keywords || [],
+        tone: targetArticle.tone || "informative",
+        audience: targetArticle.audience || "a general audience",
         messages: nextMessages,
         library_count: articles.length,
         library_recent: libraryRecent,
       });
+
+      let rawReply = plan.reply || "";
+      if (plan.switch_to_article_id && plan.switch_to_article_id !== targetArticle.id) {
+        const switched = articles.find((a) => a.id === plan.switch_to_article_id);
+        if (switched) {
+          pickArticle(switched.id);
+          targetArticle = switched;
+          targetThreadKey = `agent:${switched.id}`;
+          switchNotice = `Switched to **${switched.title || switched.topic}**.\n\n`;
+          pushMsgToThread(targetThreadKey, { role: "user", content: text });
+
+          // Strip refusal text & fetch real answer via askLibrary if needed
+          if (!rawReply || rawReply.toLowerCase().includes("not mentioned")) {
+            try {
+              const libRes = await askLibrary(text);
+              if (libRes?.answer) {
+                rawReply = libRes.answer;
+              } else {
+                rawReply = `Here is the relevant article: **${switched.title || switched.topic}**. What would you like to know or edit?`;
+              }
+            } catch {
+              rawReply = `Switched to **${switched.title || switched.topic}**.`;
+            }
+          }
+        }
+      }
+
       const actions = Array.isArray(plan.actions) ? plan.actions : [];
       const clarification =
         plan.clarification &&
@@ -921,22 +1070,20 @@ export default function Agent() {
                 : [],
             }
           : null;
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: "assistant",
-          content:
-            plan.reply ||
+      pushMsgToThread(targetThreadKey, {
+        role: "assistant",
+        content:
+          switchNotice +
+          (rawReply ||
             (clarification
               ? clarification.question
               : actions.length
               ? "Working on it."
-              : "OK."),
-          plannedActions: actions.length,
-          clarification,
-        },
-      ]);
-      let currentArticle = selected;
+              : "OK.")),
+        plannedActions: actions.length,
+        clarification,
+      });
+      let currentArticle = targetArticle;
       for (const action of actions) {
         pushAgentStep({
           tool: action.tool,
@@ -954,10 +1101,13 @@ export default function Agent() {
         }
       }
     } catch (err) {
-      setMessages((prev) => [
-        ...prev,
-        { role: "assistant", content: `Error: ${err.message}`, error: true },
-      ]);
+      const isRateLimit =
+        err.message?.toLowerCase().includes("rate limit") ||
+        err.message?.includes("429");
+      const fallbackReply = isRateLimit
+        ? `Rate limit reached on AI service. Please wait a few seconds and try asking again.`
+        : `Error processing request: ${err.message}`;
+      pushMsgToThread(targetThreadKey, { role: "assistant", content: fallbackReply, error: true });
     } finally {
       setChatLoading(false);
     }
@@ -1451,7 +1601,7 @@ export default function Agent() {
               <div key={i} className={`chat-msg assistant${m.error ? " error" : ""}`}>
                 <div className="chat-avatar">🤖</div>
                 <div className="chat-bubble">
-                  {m.content}
+                  {renderFormattedText(m.content)}
                   {m.plannedActions > 0 && (
                     <div className="chat-bubble-tag">
                       Running {m.plannedActions} action

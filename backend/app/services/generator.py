@@ -341,27 +341,14 @@ def _parse_agent_json(raw: str) -> dict:
 
 
 def _render_library_context(req) -> str:
-    """Render the user's saved-article library as a short block the planner can
-    reference to answer meta questions ("how many articles do I have?", "what
-    did I write last week?"). Kept compact so it doesn't dominate the prompt."""
+    """Render a compact library index to keep token consumption minimal."""
     count = getattr(req, "library_count", 0) or 0
     recent = getattr(req, "library_recent", None) or []
-    lines = [
-        "User's article library (persisted in the database):",
-        f"Total saved articles: {count}",
-    ]
-    if recent:
-        total_words = sum((getattr(r, "word_count", 0) or 0) for r in recent)
-        lines.append(
-            f"Most recent {len(recent)} (approximate — total words across these: {total_words}):"
-        )
-        for r in recent:
-            created = (getattr(r, "created_at", "") or "")[:10]
-            title = (getattr(r, "title", "") or getattr(r, "topic", "") or "(untitled)").strip()
-            wc = getattr(r, "word_count", 0) or 0
-            lines.append(f"- [{created or '????-??-??'}] {title} — {wc} words")
-    else:
-        lines.append("(No recent articles in context.)")
+    lines = [f"User library (total {count}):"]
+    for r in recent[:5]:
+        rid = getattr(r, "id", None)
+        title = (getattr(r, "title", "") or getattr(r, "topic", "") or "(untitled)").strip()
+        lines.append(f"- ID {rid}: {title}")
     return "\n".join(lines)
 
 
@@ -587,17 +574,20 @@ _GEMINI_BASE_URL = "https://generativelanguage.googleapis.com/v1beta/openai/"
 _GROQ_BASE_URL = "https://api.groq.com/openai/v1"
 
 
-def _create_with_retry(client, *, retries: int = 2, **kwargs):
-    """Call chat.completions.create, retrying briefly on transient 429 rate limits."""
-    from openai import RateLimitError
+def _create_with_retry(client, *, retries: int = 1, **kwargs):
+    """Call chat.completions.create, retrying once briefly on transient 429 rate limits."""
+    from openai import APIStatusError, RateLimitError
 
     for attempt in range(retries + 1):
         try:
             return client.chat.completions.create(**kwargs)
-        except RateLimitError:
+        except (RateLimitError, APIStatusError) as exc:
+            status = getattr(exc, "status_code", getattr(exc, "code", None))
+            if status != 429 and not isinstance(exc, RateLimitError):
+                raise
             if attempt >= retries:
                 raise
-            time.sleep(2.5 * (attempt + 1))
+            time.sleep(0.5)
 
 
 class ArticleGenerator:
@@ -607,21 +597,42 @@ class ArticleGenerator:
     def _text_providers(self) -> list[tuple[str, str, str, str]]:
         """Ordered (name, api_key, base_url, model) for text generation.
 
-        Groq is preferred when configured; Gemini is the fallback. Web grounding and
-        image generation stay on Gemini (Groq supports neither).
+        Failover chain using verified active models across Groq and Gemini.
         """
         chain: list[tuple[str, str, str, str]] = []
         if self.settings.groq_api_key:
             chain.append(
-                ("groq", self.settings.groq_api_key, _GROQ_BASE_URL, self.settings.groq_model)
+                ("groq-120b", self.settings.groq_api_key, _GROQ_BASE_URL, "openai/gpt-oss-120b")
+            )
+            chain.append(
+                ("groq-20b", self.settings.groq_api_key, _GROQ_BASE_URL, "openai/gpt-oss-20b")
+            )
+            chain.append(
+                ("groq-qwen", self.settings.groq_api_key, _GROQ_BASE_URL, "qwen/qwen3.6-27b")
             )
         if self.settings.gemini_api_key:
             chain.append(
                 (
-                    "gemini",
+                    "gemini-flash-latest",
                     self.settings.gemini_api_key,
                     _GEMINI_BASE_URL,
-                    self.settings.gemini_model,
+                    "gemini-flash-latest",
+                )
+            )
+            chain.append(
+                (
+                    "gemini-36-flash",
+                    self.settings.gemini_api_key,
+                    _GEMINI_BASE_URL,
+                    "gemini-3.6-flash",
+                )
+            )
+            chain.append(
+                (
+                    "gemini-37-flash",
+                    self.settings.gemini_api_key,
+                    _GEMINI_BASE_URL,
+                    "gemini-3.7-flash",
                 )
             )
         return chain
@@ -1533,100 +1544,24 @@ class ArticleGenerator:
         if not history:
             raise ValueError("No user message provided.")
 
-        digest = _article_digest(_strip_sources(req.markdown)) or req.markdown[:600]
+        # Cap the article digest to 300 chars and chat history to last 3 turns
+        raw_markdown = _strip_sources(req.markdown) if req.markdown else ""
+        digest = _article_digest(raw_markdown, limit=300) if raw_markdown else ""
+        if not digest:
+            digest = raw_markdown[:300]
+        history = history[-3:]
         kw = ", ".join(k for k in (req.keywords or []) if k.strip())
         system = (
-            "You are the ContentPilot AGENT. The user is chatting with an AI that can "
-            "either answer a question or run tools that change / augment their article.\n\n"
-            "Available tools (call by name):\n"
-            '- edit(instruction: string): any content change to the article body — '
-            "rewrite phrasing, add/remove/restructure sections, add facts or stats, "
-            "change tone, tighten, expand, fix a claim, change the title, etc.\n"
-            '- improve_seo(): comprehensive SEO rewrite (title 50-60 chars, meta '
-            "120-160, ≥3 H2s, keyword density, readability). Use when the user says "
-            '"improve SEO", "boost SEO score", "make it more search-friendly", etc.\n'
-            '- translate(language: string): translate the whole article. `language` '
-            'is any target language name (e.g. "Spanish", "Hindi", "French"). '
-            "Replaces the article body in place.\n"
-            "- section_images(): generate an AI image for each H2 section and insert "
-            "it into the article.\n"
-            "- cover_image(): generate a single AI cover / hero image for the "
-            'article. Use for "add a cover image", "generate a hero image", "make '
-            'a banner". (The article must be saved first.)\n'
-            "- social(): generate an X/Twitter thread, LinkedIn post, and email "
-            "newsletter based on the article.\n"
-            "- faq(): generate 5 FAQ items for the article.\n"
-            "- competitors(): web SERP scan for the topic — top-ranking pages, "
-            "content gaps, suggested extra sections.\n"
-            "- seo_report(): ANALYZE and REPORT the article's SEO + readability "
-            "score, headings, length, and keyword usage — WITHOUT changing it. Use "
-            'for "check my SEO", "how readable is this?", "what\'s my SEO score?". '
-            "(This only reports; use improve_seo to actually rewrite.)\n"
-            "- proofread(): fix ONLY grammar, spelling, and punctuation — a light "
-            'touch-up that never changes meaning or structure. Use for "proofread", '
-            '"fix typos", "check grammar".\n'
-            "- summarize(): add a short \"Key takeaways\" bullet summary near the top "
-            'of the article. Use for "summarize this", "add a TL;DR", "add key '
-            'takeaways".\n'
-            '- export(format: string): download or print the current article. '
-            '`format` is either "pdf" (opens the browser print dialog — the user '
-            'can Save-as-PDF from there; use this for "print", "open print '
-            'dialog", "save as pdf") or "html" (downloads a standalone .html '
-            'file; use this for "download", "export as html", "save the '
-            'article"). Defaults to "pdf" if the user just says "print".\n\n'
+            "You are ContentPilot Agent. Answer questions about the article or route to tools.\n"
+            "Tools: edit(instruction), improve_seo(), translate(language), section_images(), cover_image(), social(), faq(), competitors(), seo_report(), proofread(), summarize(), export(format: 'pdf'|'html').\n"
             "Rules:\n"
-            "- Answer PLAIN QUESTIONS about the article without any actions (e.g. "
-            '"what is the word count?", "who is the target audience?").\n'
-            "- Answer META QUESTIONS about the user's saved library (count, recent "
-            "titles, dates, total words) without any actions, using the library "
-            "context provided at the bottom of this prompt.\n"
-            "- Pick the SMALLEST action set that satisfies the request. Usually 1 "
-            "action, occasionally 2-3 when the user chains requests explicitly "
-            '("translate to Spanish and add section images").\n'
-            "- Prefer `edit` for any content change that is not covered by a "
-            "specialised tool. Do NOT try to do content edits via translate/seo/"
-            "social/faq/competitors.\n"
-            "- Never invent tools or arguments outside the schema above.\n"
-            "- For `translate`, always provide a `language` string. For `edit`, "
-            "always provide a clear, self-contained `instruction` string that "
-            "the downstream editor can act on without further context.\n"
-            "- CLARIFICATION LOOP: if the user's request is AMBIGUOUS or missing a "
-            "required parameter, DO NOT guess. Instead return a `clarification` "
-            "object with a short question and 2-5 concrete options the user can "
-            "click. Leave `actions` empty in that case. Examples of when to "
-            'clarify:\n'
-            '  * "translate this" — no language given → ask which language with '
-            'options ["Spanish", "French", "Hindi", "German", "Japanese"].\n'
-            '  * "make it better" — vague → ask what to improve with options '
-            '["Improve SEO", "Rewrite for clarity", "Make it more engaging", '
-            '"Shorten it", "Expand with more detail"].\n'
-            '  * "add a section" — no topic given → ask what the section should '
-            "cover (provide 3-5 topic suggestions based on the article).\n"
-            '  * "export this" — format unclear → options ["Print as PDF", '
-            '"Download as HTML"].\n'
-            "  Do NOT clarify when the intent is obvious (e.g. \"improve SEO\", "
-            '"generate FAQ", "translate to Spanish", "print this as pdf").\n\n'
-            "OUTPUT FORMAT: reply with a JSON object ONLY. No prose, no markdown "
-            "fences. Schema (use EITHER `actions` OR `clarification`, not both):\n"
-            "{\n"
-            '  "reply": "<short natural-language message shown to the user (1-2 '
-            "sentences). Describe what you're about to do, answer their "
-            'question, or introduce the clarification.>",\n'
-            '  "actions": [{"tool": "<one of: edit, improve_seo, translate, '
-            "section_images, cover_image, social, faq, competitors, export, "
-            "seo_report, proofread, summarize>\", \"args\": {<per-tool "
-            "args>}}],\n"
-            '  "clarification": {"question": "<the question to ask>", "options": '
-            '["<option 1>", "<option 2>", ...]}  // omit this field entirely '
-            "when the request is unambiguous\n"
-            "}\n\n"
-            "Current article context:\n"
-            f"Title: {req.title}\n"
-            f"Topic: {req.topic}\n"
-            f"Keywords: {kw or '(none)'}\n"
-            f"Meta description: {req.meta_description}\n"
-            "Article digest:\n"
-            f"{digest}\n\n"
+            "- Plain questions: reply naturally, actions=[].\n"
+            "- Ambiguous requests: reply with clarification object {question, options: []}, actions=[].\n"
+            "- Cross-article: if question matches a library article below, answer directly and return switch_to_article_id: <int id>.\n"
+            "- Unrelated/off-topic: reply 'That topic is not mentioned in any article in your library. Please ask a question related to your articles, or generate a new article in the Generator.'\n"
+            "Output JSON ONLY: {\"reply\": \"...\", \"actions\": [{\"tool\": \"...\", \"args\": {}}], \"clarification\": null, \"switch_to_article_id\": null}\n\n"
+            f"Article: {req.title} | Topic: {req.topic} | Keywords: {kw or 'none'}\n"
+            f"Digest: {digest}\n"
             f"{_render_library_context(req)}"
         )
 
@@ -1638,17 +1573,25 @@ class ArticleGenerator:
             raw, provider = self._complete_json(
                 [{"role": "system", "content": system}, *history],
                 temperature=0.2,
-                max_tokens=1024,
+                max_tokens=300,
             )
         except Exception:  # noqa: BLE001 - fall through to plain _complete
             raw, provider = self._complete(
                 [{"role": "system", "content": system}, *history],
                 temperature=0.2,
-                max_tokens=1024,
+                max_tokens=300,
             )
 
         data = _parse_agent_json(raw)
         reply = str(data.get("reply") or "").strip() or "OK."
+
+        switch_id_raw = data.get("switch_to_article_id")
+        switch_to_article_id = None
+        if switch_id_raw is not None:
+            try:
+                switch_to_article_id = int(switch_id_raw)
+            except (ValueError, TypeError):
+                switch_to_article_id = None
 
         clarification: AgentClarification | None = None
         c_raw = data.get("clarification")
@@ -1699,6 +1642,7 @@ class ArticleGenerator:
             reply=reply,
             actions=actions,
             clarification=clarification,
+            switch_to_article_id=switch_to_article_id,
             provider=provider,
         )
 

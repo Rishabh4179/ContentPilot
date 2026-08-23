@@ -435,12 +435,17 @@ export default function Dashboard() {
           {!empty && (
             <button
               type="button"
-              className="ghost dash-digest-btn"
-              onClick={handleEmailDigest}
-              disabled={digestBusy}
-              title="Email yourself a summary of your library"
+              className="ghost dash-digest-btn dash-coming-soon-btn"
+              onClick={() =>
+                setDigestMsg({
+                  kind: "preview",
+                  text: "📧 Email Digest feature is coming soon in Version 2.0!",
+                })
+              }
+              title="Email Digest is coming soon in Version 2.0"
             >
-              {digestBusy ? "Sending…" : "📧 Email me this digest"}
+              <span>📧 Email me this digest</span>
+              <span className="dash-badge-v2">Coming Soon</span>
             </button>
           )}
           <button type="button" className="generate" onClick={() => navigate("/")}>
@@ -449,71 +454,20 @@ export default function Dashboard() {
         </div>
       </header>
 
-      {sub && (
-        <div className="dash-sub-row card">
-          <div className="dash-sub-info">
+      <div className="dash-sub-row card dash-sub-coming-soon">
+        <div className="dash-sub-info">
+          <div className="dash-sub-title-row">
             <span className="dash-sub-title">📬 Weekly email digest</span>
-            <span className="dash-sub-desc">
-              {sub.enabled
-                ? `On — emailed every ${DAY_NAMES[sub.send_day] || "Monday"} at ${formatHour(sub.send_hour ?? 9)}${sub.timezone ? ` (${sub.timezone})` : ""}${sub.email ? ` to ${sub.email}` : ""}.`
-                : "Off — get a stats summary emailed to you every week."}
-              {!sub.email_configured && (
-                <span className="dash-sub-warn">
-                  {" "}
-                  (server email isn’t configured yet, so delivery is paused)
-                </span>
-              )}
-            </span>
+            <span className="dash-badge-coming-soon">Coming Soon in v2.0</span>
           </div>
-          <div className="dash-sub-controls">
-            {sub.enabled && (
-              <>
-                <label className="dash-sub-day">
-                  <span>Every</span>
-                  <select
-                    value={sub.send_day ?? 0}
-                    onChange={(e) => handleChangeDay(e.target.value)}
-                    disabled={subBusy}
-                    aria-label="Day of week to receive the digest"
-                  >
-                    {DAY_NAMES.map((d, i) => (
-                      <option key={d} value={i}>
-                        {d}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <label className="dash-sub-day">
-                  <span>at</span>
-                  <select
-                    value={sub.send_hour ?? 9}
-                    onChange={(e) => handleChangeTime(e.target.value)}
-                    disabled={subBusy}
-                    aria-label="Time of day to receive the digest"
-                  >
-                    {Array.from({ length: 24 }, (_, h) => (
-                      <option key={h} value={h}>
-                        {formatHour(h)}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-              </>
-            )}
-            <button
-              type="button"
-              className={`dash-toggle${sub.enabled ? " on" : ""}`}
-              role="switch"
-              aria-checked={sub.enabled}
-              onClick={handleToggleSubscription}
-              disabled={subBusy}
-              title={sub.enabled ? "Unsubscribe" : "Subscribe"}
-            >
-              <span className="dash-toggle-knob" />
-            </button>
-          </div>
+          <span className="dash-sub-desc">
+            Automated weekly library summaries and performance insights delivered directly to your inbox. Launching in Version 2.0.
+          </span>
         </div>
-      )}
+        <div className="dash-sub-controls">
+          <span className="dash-badge-pill">v2.0 Feature</span>
+        </div>
+      </div>
 
       {digestMsg && (
         <div className={`dash-digest-msg dash-digest-${digestMsg.kind}`}>

@@ -613,7 +613,9 @@ export async function planAgentActions(payload) {
     let detail = `Agent planning failed (${res.status})`;
     try {
       const data = await res.json();
-      if (data.detail) detail = data.detail;
+      if (data.detail) {
+        detail = typeof data.detail === "object" ? JSON.stringify(data.detail) : String(data.detail);
+      }
     } catch {
       /* ignore parse errors */
     }

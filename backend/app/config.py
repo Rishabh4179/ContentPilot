@@ -8,10 +8,10 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 
     gemini_api_key: str = ""
-    gemini_model: str = "gemini-2.5-flash"
+    gemini_model: str = "gemini-flash-latest"
     gemini_embedding_model: str = "gemini-embedding-001"
     groq_api_key: str = ""
-    groq_model: str = "llama-3.3-70b-versatile"
+    groq_model: str = "openai/gpt-oss-120b"
     groq_compound_model: str = "groq/compound-mini"
     gemini_image_model: str = "gemini-2.5-flash-image"
     # Image provider: "pollinations" (free, no key), "cloudflare" (free FLUX.1 via a
