@@ -608,6 +608,22 @@ button {
   animation: spin 0.7s linear infinite;
 }
 
+.spinner-sm {
+  width: 12px;
+  height: 12px;
+  border-width: 2px;
+  vertical-align: -1px;
+}
+
+.spinner-md {
+  width: 22px;
+  height: 22px;
+  border-width: 2.5px;
+  border-color: rgba(var(--accent-rgb), 0.25);
+  border-top-color: var(--accent);
+  flex-shrink: 0;
+}
+
 .spinner-lg {
   width: 34px;
   height: 34px;
@@ -1913,7 +1929,7 @@ button {
   margin-top: 2px;
 }
 
-/* ---------- Cover image ---------- */
+/* ---------- Cover image & Media Generation Banner ---------- */
 .cover-img {
   display: block;
   width: 100%;
@@ -1923,6 +1939,60 @@ button {
   border: 1px solid var(--border);
   margin-bottom: 1.25rem;
   animation: fade-in 0.4s ease;
+}
+
+.media-generating-banner {
+  display: flex;
+  align-items: center;
+  gap: 1.1rem;
+  padding: 1.15rem 1.4rem;
+  margin-bottom: 1.25rem;
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(var(--accent-rgb), 0.14), rgba(var(--accent-2-rgb), 0.12));
+  border: 1px solid rgba(var(--accent-rgb), 0.4);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+  animation: pulse-media-border 2s ease-in-out infinite alternate;
+}
+
+@keyframes pulse-media-border {
+  0% {
+    border-color: rgba(var(--accent-rgb), 0.3);
+    box-shadow: 0 0 12px rgba(var(--accent-rgb), 0.1);
+  }
+  100% {
+    border-color: rgba(var(--accent-rgb), 0.7);
+    box-shadow: 0 0 24px rgba(var(--accent-rgb), 0.3);
+  }
+}
+
+.media-generating-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.media-generating-text h4 {
+  margin: 0;
+  font-size: 0.96rem;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+
+.media-generating-text p {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+button.is-loading {
+  opacity: 0.95;
+  cursor: wait;
+  pointer-events: none;
+  background: rgba(var(--accent-rgb), 0.2) !important;
+  border-color: rgba(var(--accent-rgb), 0.5) !important;
+  color: var(--text) !important;
 }
 
 /* ---------- Rendered article ---------- */

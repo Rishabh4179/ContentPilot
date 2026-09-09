@@ -1846,12 +1846,23 @@ export default function App() {
                   <div className="action-menu">
                     <button
                       type="button"
-                      className="ghost"
+                      className={`ghost ${coverLoading || sectionImagesLoading ? "is-loading" : ""}`}
                       aria-haspopup="menu"
                       aria-expanded={openMenu === "media"}
                       onClick={() => setOpenMenu(openMenu === "media" ? null : "media")}
+                      disabled={coverLoading || sectionImagesLoading}
                     >
-                      Media ▾
+                      {coverLoading ? (
+                        <>
+                          <span className="spinner spinner-sm" /> Creating cover…
+                        </>
+                      ) : sectionImagesLoading ? (
+                        <>
+                          <span className="spinner spinner-sm" /> Adding images…
+                        </>
+                      ) : (
+                        "Media ▾"
+                      )}
                     </button>
                     {openMenu === "media" && (
                       <div className="action-menu-items" role="menu">
@@ -1899,12 +1910,27 @@ export default function App() {
                   <div className="action-menu">
                     <button
                       type="button"
-                      className="ghost"
+                      className={`ghost ${translateLoading || faqLoading || socialLoading ? "is-loading" : ""}`}
                       aria-haspopup="menu"
                       aria-expanded={openMenu === "repurpose"}
                       onClick={() => setOpenMenu(openMenu === "repurpose" ? null : "repurpose")}
+                      disabled={translateLoading || faqLoading || socialLoading}
                     >
-                      Repurpose ▾
+                      {translateLoading ? (
+                        <>
+                          <span className="spinner spinner-sm" /> Translating…
+                        </>
+                      ) : faqLoading ? (
+                        <>
+                          <span className="spinner spinner-sm" /> Building FAQ…
+                        </>
+                      ) : socialLoading ? (
+                        <>
+                          <span className="spinner spinner-sm" /> Repurposing…
+                        </>
+                      ) : (
+                        "Repurpose ▾"
+                      )}
                     </button>
                     {openMenu === "repurpose" && (
                       <div className="action-menu-items" role="menu">
@@ -1941,7 +1967,27 @@ export default function App() {
                 </div>
               </div>
 
-              {result.cover_url && (
+              {coverLoading && (
+                <div className="media-generating-banner" role="status" aria-live="polite">
+                  <span className="spinner spinner-md" />
+                  <div className="media-generating-text">
+                    <h4>🎨 Creating AI Cover Artwork…</h4>
+                    <p>Generating artwork and uploading to cloud storage. Please wait a moment.</p>
+                  </div>
+                </div>
+              )}
+
+              {sectionImagesLoading && (
+                <div className="media-generating-banner" role="status" aria-live="polite">
+                  <span className="spinner spinner-md" />
+                  <div className="media-generating-text">
+                    <h4>🖼️ Adding Section Illustrations…</h4>
+                    <p>Analyzing key sections, generating visual images, and embedding them into the article.</p>
+                  </div>
+                </div>
+              )}
+
+              {result.cover_url && !coverLoading && (
                 <img
                   className="cover-img"
                   src={result.cover_url}
