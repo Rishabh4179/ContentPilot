@@ -1,0 +1,39 @@
+name: Keep Supabase Active
+
+on:
+  schedule:
+    # Runs every 3 days at 06:00 UTC (keeps the Supabase project active)
+    - cron: '0 6 */3 * *'
+  workflow_dispatch: # Allows manual trigger from GitHub Actions tab
+
+jobs:
+  ping-supabase:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Supabase REST API
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY || secrets.SUPABASE_ANON_KEY }}
+        run: |
+          if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_KEY" ]; then
+            echo "Error: SUPABASE_URL or SUPABASE_KEY secret is missing."
+            exit 1
+          fi
+          
+          # Remove trailing slash if present
+          CLEAN_URL="${SUPABASE_URL%/}"
+          
+          echo "Pinging Supabase at $CLEAN_URL/rest/v1/ ..."
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "apikey: $SUPABASE_KEY" \
+            -H "Authorization: Bearer $SUPABASE_KEY" \
+            "$CLEAN_URL/rest/v1/")
+            
+          echo "Response HTTP Status: $HTTP_STATUS"
+          
+          if [ "$HTTP_STATUS" -ge 200 ] && [ "$HTTP_STATUS" -lt 400 ]; then
+            echo "Successfully pinged Supabase. Project activity recorded!"
+          else
+            echo "Warning: Received unexpected HTTP status $HTTP_STATUS"
+            exit 1
+          fi
