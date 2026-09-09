@@ -1,0 +1,133 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 620" width="100%" height="100%">
+  <defs>
+    <linearGradient id="dbBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0b0f19" />
+      <stop offset="100%" stop-color="#0f172a" />
+    </linearGradient>
+    <linearGradient id="accentBar" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#6366f1" />
+      <stop offset="100%" stop-color="#8b5cf6" />
+    </linearGradient>
+    <linearGradient id="goldRank" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#f59e0b" />
+      <stop offset="100%" stop-color="#fbbf24" />
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="620" fill="url(#dbBg)" />
+
+  <!-- Dashboard Header -->
+  <g transform="translate(60, 40)">
+    <text x="0" y="24" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="24" font-weight="800">📊 Dashboard &amp; Library Intelligence</text>
+    <text x="0" y="48" fill="#94a3b8" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="14">Insights and analytics across your entire generated library</text>
+  </g>
+
+  <!-- Metric Stat Cards Row -->
+  <g transform="translate(60, 110)">
+    <!-- Card 1 -->
+    <rect x="0" y="0" width="250" height="90" rx="12" fill="#1e293b" stroke="#334155" />
+    <text x="20" y="34" fill="#94a3b8" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600">TOTAL ARTICLES</text>
+    <text x="20" y="68" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="28" font-weight="800">42</text>
+    <text x="65" y="68" fill="#10b981" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700">▲ +8 this week</text>
+
+    <!-- Card 2 -->
+    <rect x="276" y="0" width="250" height="90" rx="12" fill="#1e293b" stroke="#334155" />
+    <text x="296" y="34" fill="#94a3b8" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600">TOTAL WORDS WRITTEN</text>
+    <text x="296" y="68" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="28" font-weight="800">54,820</text>
+
+    <!-- Card 3 -->
+    <rect x="552" y="0" width="250" height="90" rx="12" fill="#1e293b" stroke="#334155" />
+    <text x="572" y="34" fill="#94a3b8" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600">READING TIME</text>
+    <text x="572" y="68" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="28" font-weight="800">274 min</text>
+
+    <!-- Card 4 -->
+    <rect x="828" y="0" width="250" height="90" rx="12" fill="#1e293b" stroke="#334155" />
+    <text x="848" y="34" fill="#94a3b8" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600">TOP AUDIENCE</text>
+    <text x="848" y="68" fill="#818cf8" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="22" font-weight="700">Engineers</text>
+  </g>
+
+  <!-- 3-Column Content Distribution Grid -->
+  <g transform="translate(60, 225)">
+    <!-- Column 1: Audiences -->
+    <rect x="0" y="0" width="345" height="175" rx="14" fill="#1e293b" stroke="#334155" />
+    <text x="20" y="34" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="15" font-weight="700">🎯 Target Audiences</text>
+    
+    <text x="20" y="68" fill="#cbd5e1" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="13">Software Engineers</text>
+    <rect x="20" y="76" width="230" height="8" rx="4" fill="#0f172a" />
+    <rect x="20" y="76" width="170" height="8" rx="4" fill="url(#accentBar)" />
+    <text x="260" y="84" fill="#94a3b8" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12">18 (65%)</text>
+
+    <text x="20" y="118" fill="#cbd5e1" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="13">Product Managers</text>
+    <rect x="20" y="126" width="230" height="8" rx="4" fill="#0f172a" />
+    <rect x="20" y="126" width="90" height="8" rx="4" fill="#10b981" />
+    <text x="260" y="134" fill="#94a3b8" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12">9 (35%)</text>
+
+    <!-- Column 2: Tones -->
+    <rect x="367" y="0" width="345" height="175" rx="14" fill="#1e293b" stroke="#334155" />
+    <text x="387" y="34" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="15" font-weight="700">🎭 Writing Tones</text>
+    
+    <text x="387" y="68" fill="#cbd5e1" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="13">Professional</text>
+    <rect x="387" y="76" width="230" height="8" rx="4" fill="#0f172a" />
+    <rect x="387" y="76" width="180" height="8" rx="4" fill="#ec4899" />
+    <text x="627" y="84" fill="#94a3b8" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12">20 (70%)</text>
+
+    <text x="387" y="118" fill="#cbd5e1" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="13">Conversational</text>
+    <rect x="387" y="126" width="230" height="8" rx="4" fill="#0f172a" />
+    <rect x="387" y="126" width="80" height="8" rx="4" fill="#f59e0b" />
+    <text x="627" y="134" fill="#94a3b8" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12">8 (30%)</text>
+
+    <!-- Column 3: Lengths -->
+    <rect x="734" y="0" width="345" height="175" rx="14" fill="#1e293b" stroke="#334155" />
+    <text x="754" y="34" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="15" font-weight="700">📏 Article Lengths</text>
+    
+    <text x="754" y="68" fill="#cbd5e1" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="13">Medium (~800–1000 words)</text>
+    <rect x="754" y="76" width="230" height="8" rx="4" fill="#0f172a" />
+    <rect x="754" y="76" width="160" height="8" rx="4" fill="#06b6d4" />
+    <text x="994" y="84" fill="#94a3b8" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12">22 (68%)</text>
+
+    <text x="754" y="118" fill="#cbd5e1" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="13">Long (~1500+ words)</text>
+    <rect x="754" y="126" width="230" height="8" rx="4" fill="#0f172a" />
+    <rect x="754" y="126" width="90" height="8" rx="4" fill="#a855f7" />
+    <text x="994" y="134" fill="#94a3b8" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12">10 (32%)</text>
+  </g>
+
+  <!-- Keyword Intelligence Panel -->
+  <g transform="translate(60, 420)">
+    <rect x="0" y="0" width="1078" height="165" rx="14" fill="#1e293b" stroke="#334155" />
+    <text x="24" y="34" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="700">🏷️ Keyword Intelligence &amp; Search Trends</text>
+    <text x="24" y="54" fill="#94a3b8" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12">Live tracked search concepts discovered across generated articles</text>
+
+    <!-- Chips Row -->
+    <g transform="translate(24, 75)">
+      <!-- Tag 1 -->
+      <rect x="0" y="0" width="210" height="34" rx="17" fill="#6366f1" fill-opacity="0.2" stroke="#6366f1" stroke-width="1" />
+      <text x="14" y="22" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12">🥇 ai in cartography</text>
+      <rect x="165" y="6" width="30" height="22" rx="11" fill="#6366f1" />
+      <text x="175" y="21" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="700">12</text>
+
+      <!-- Tag 2 -->
+      <rect x="225" y="0" width="230" height="34" rx="17" fill="#8b5cf6" fill-opacity="0.2" stroke="#8b5cf6" stroke-width="1" />
+      <text x="239" y="22" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12">🥈 vector tile optimization</text>
+      <rect x="415" y="6" width="26" height="22" rx="11" fill="#8b5cf6" />
+      <text x="424" y="21" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="700">8</text>
+
+      <!-- Tag 3 -->
+      <rect x="470" y="0" width="200" height="34" rx="17" fill="#ec4899" fill-opacity="0.2" stroke="#ec4899" stroke-width="1" />
+      <text x="484" y="22" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12">🥉 equal earth projection</text>
+      <rect x="635" y="6" width="24" height="22" rx="11" fill="#ec4899" />
+      <text x="643" y="21" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="700">6</text>
+
+      <!-- Tag 4 -->
+      <rect x="685" y="0" width="180" height="34" rx="17" fill="#0f172a" stroke="#334155" stroke-width="1" />
+      <text x="700" y="22" fill="#cbd5e1" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12">webgis architecture</text>
+      <rect x="830" y="6" width="22" height="22" rx="11" fill="#334155" />
+      <text x="837" y="21" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="700">4</text>
+
+      <!-- Tag 5 -->
+      <rect x="880" y="0" width="165" height="34" rx="17" fill="#0f172a" stroke="#334155" stroke-width="1" />
+      <text x="895" y="22" fill="#cbd5e1" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12">geospatial api</text>
+      <rect x="1010" y="6" width="22" height="22" rx="11" fill="#334155" />
+      <text x="1017" y="21" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="700">3</text>
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 480" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0b0f19" />
+      <stop offset="50%" stop-color="#111827" />
+      <stop offset="100%" stop-color="#0f172a" />
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#6366f1" />
+      <stop offset="50%" stop-color="#8b5cf6" />
+      <stop offset="100%" stop-color="#ec4899" />
+    </linearGradient>
+    <linearGradient id="cardGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b" stop-opacity="0.85" />
+      <stop offset="100%" stop-color="#0f172a" stop-opacity="0.7" />
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="30" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="480" fill="url(#bgGrad)" />
+  <circle cx="200" cy="120" r="180" fill="#6366f1" opacity="0.15" filter="url(#glow)" />
+  <circle cx="1000" cy="360" r="220" fill="#ec4899" opacity="0.12" filter="url(#glow)" />
+
+  <!-- App Header Bar -->
+  <rect x="80" y="40" width="1040" height="50" rx="12" fill="#1e293b" opacity="0.6" stroke="#334155" stroke-width="1" />
+  <circle cx="115" cy="65" r="7" fill="#ef4444" />
+  <circle cx="135" cy="65" r="7" fill="#f59e0b" />
+  <circle cx="155" cy="65" r="7" fill="#10b981" />
+  <text x="185" y="70" fill="#f8fafc" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="700">✍️ ContentPilot</text>
+  <text x="320" y="70" fill="#94a3b8" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="14">🌐 Generator</text>
+  <text x="440" y="70" fill="#94a3b8" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="14">🤖 AI Agent</text>
+  <text x="540" y="70" fill="#94a3b8" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="14">📚 Library</text>
+  <text x="630" y="70" fill="#94a3b8" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="14">📊 Dashboard</text>
+
+  <!-- Hero Content -->
+  <g transform="translate(80, 120)">
+    <!-- Main Generator Card -->
+    <rect x="0" y="0" width="480" height="320" rx="16" fill="url(#cardGrad)" stroke="#334155" stroke-width="1" />
+    <text x="24" y="38" fill="#f8fafc" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="700">Article Topic</text>
+    <rect x="24" y="52" width="432" height="42" rx="8" fill="#0f172a" stroke="#475569" stroke-width="1" />
+    <text x="38" y="78" fill="#cbd5e1" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="14">The Evolution of Modern Web Cartography &amp; Projections</text>
+    
+    <text x="24" y="125" fill="#94a3b8" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="600">Tone &amp; Audience</text>
+    <rect x="24" y="136" width="130" height="32" rx="6" fill="#0f172a" stroke="#334155" />
+    <text x="36" y="157" fill="#cbd5e1" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12">Professional</text>
+    <rect x="164" y="136" width="180" height="32" rx="6" fill="#0f172a" stroke="#334155" />
+    <text x="176" y="157" fill="#cbd5e1" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12">Software Engineers</text>
+
+    <!-- Generate Button -->
+    <rect x="24" y="240" width="432" height="48" rx="10" fill="url(#accentGrad)" />
+    <text x="175" y="270" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="15" font-weight="700">🌐 Generate Article</text>
+  </g>
+
+  <!-- Output & Insights Preview Card -->
+  <g transform="translate(590, 120)">
+    <rect x="0" y="0" width="530" height="320" rx="16" fill="url(#cardGrad)" stroke="#334155" stroke-width="1" />
+    
+    <!-- Meta Box -->
+    <rect x="24" y="24" width="482" height="60" rx="8" fill="#0f172a" stroke="#334155" stroke-width="1" />
+    <text x="36" y="44" fill="#818cf8" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="700">META DESCRIPTION</text>
+    <text x="36" y="66" fill="#94a3b8" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12">Comprehensive overview of modern geospatial projections and visual accuracy...</text>
+
+    <!-- SEO & Media Pill Row -->
+    <rect x="24" y="96" width="100" height="30" rx="15" fill="#10b981" fill-opacity="0.2" stroke="#10b981" stroke-width="1" />
+    <text x="36" y="116" fill="#34d399" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700">SEO 95/100</text>
+
+    <rect x="134" y="96" width="130" height="30" rx="15" fill="#6366f1" fill-opacity="0.2" stroke="#6366f1" stroke-width="1" />
+    <text x="146" y="116" fill="#818cf8" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600">🖼️ FLUX.1 Artwork</text>
+
+    <rect x="274" y="96" width="110" height="30" rx="15" fill="#ec4899" fill-opacity="0.2" stroke="#ec4899" stroke-width="1" />
+    <text x="286" y="116" fill="#f472b6" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600">🔁 Social Pack</text>
+
+    <!-- Article Preview Lines -->
+    <text x="24" y="165" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="700">1. The Shift from Mercator to Equal Earth</text>
+    <rect x="24" y="180" width="482" height="8" rx="4" fill="#334155" />
+    <rect x="24" y="200" width="430" height="8" rx="4" fill="#334155" />
+    <rect x="24" y="220" width="460" height="8" rx="4" fill="#334155" />
+    
+    <text x="24" y="265" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="700">2. Algorithmic Precision in Vector Tiles</text>
+    <rect x="24" y="280" width="482" height="8" rx="4" fill="#334155" />
+    <rect x="24" y="300" width="370" height="8" rx="4" fill="#334155" />
+  </g>
+</svg>

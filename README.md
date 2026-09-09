@@ -1,248 +1,205 @@
 # ✍️ ContentPilot
 
-An AI content platform: generate SEO‑ready articles, refine them with an agent, chat with
-your whole library, track analytics, and get scheduled email digests.
-
-- **Backend:** Python + FastAPI + SQLModel
-- **Frontend:** React 18 + Vite + React Router
-- **Database:** Neon Postgres
-- **Auth:** Clerk (optional — falls back to single‑user local mode)
-- **AI:** Groq (primary) → Google Gemini (fallback); Gemini embeddings for RAG;
-  Pollinations / Cloudflare FLUX / Gemini for images
+> **Autonomous AI-Powered Content Creation & Editorial Intelligence Platform**  
+> Generate web-grounded, SEO-optimized articles, refine them with an autonomous agent, query your library using semantic RAG, analyze content trends, and repurpose across platforms with one click.
 
 ---
 
-## Features
+<p align="center">
+  <img src="./assets/screenshots/hero_banner.svg" alt="ContentPilot Hero Banner" width="100%" />
+</p>
 
-**Generate**
-- Streaming article generation with tone / length / audience controls
-- Web‑grounded generation (live search) via Groq compound / Gemini grounding
-- Outline‑first workflow and section‑by‑section rewrite
-- AI cover image + per‑section images
-
-**Enhance**
-- SEO analysis + one‑click SEO rewrite
-- Translate to any language, FAQ generator, social pack (X thread / LinkedIn / newsletter)
-- Competitor SERP scan (top pages, gaps, suggested sections)
-- Export to PDF / standalone HTML
-
-**Organize**
-- Saved‑article **Library** (search, open, delete)
-- **Dashboard** analytics — totals, week‑over‑week trend, activity chart, reading time,
-  busiest day, tone/audience distributions, keyword cloud
-- 8 built‑in **themes** (Midnight, Ocean, Forest, Sunset, Rose, Nord, Mono, Daylight)
-
-**Pilot — the AI agent**
-- Plans and executes tools from plain English (edit, SEO, translate, images, social, FAQ,
-  competitors, export) with per‑step status cards
-- Clarification loop: asks with clickable options when a request is ambiguous
-- **Two independent modes**, each with ChatGPT‑style multi‑session history saved to the DB:
-  - 💬 **Article** — task chat scoped to one article
-  - 📚 **Library (RAG)** — question‑answering across your entire library with citations
-
-**Email**
-- Weekly digest email (Resend HTTP API, or SMTP fallback)
-- Per‑user schedule: pick day + time in your own timezone; one‑click unsubscribe
+<p align="center">
+  <img src="https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white" alt="FastAPI" />
+  <img src="https://img.shields.io/badge/React%2018-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" alt="React 18" />
+  <img src="https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white" alt="Vite" />
+  <img src="https://img.shields.io/badge/Groq%20LLaMA--3.3-F55036?style=for-the-badge&logo=groq&logoColor=white" alt="Groq" />
+  <img src="https://img.shields.io/badge/Google%20Gemini-4285F4?style=for-the-badge&logo=google&logoColor=white" alt="Gemini" />
+  <img src="https://img.shields.io/badge/Supabase%20Storage-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white" alt="Supabase" />
+  <img src="https://img.shields.io/badge/PostgreSQL%20(Neon)-4169E1?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL" />
+</p>
 
 ---
 
-## Project structure
+## 🌟 Overview
+
+**ContentPilot** is an end-to-end editorial platform that transforms rough concepts into comprehensive, publication-ready articles. It bridges live web research, multi-turn AI agent editing, semantic library search (RAG), dynamic AI artwork generation, and deep analytics into a cohesive, responsive workflow.
+
+---
+
+## 🚀 Key Modules & Capabilities
+
+### 1. 🌐 Web-Grounded Content Generation
+* **Live Search Grounding**: Connects real-time web search with LLMs (Groq compound systems & Google Gemini grounding) for fact-based, accurate writing.
+* **Outline-First Workflow**: Interactively propose, reorder, expand, or customize section outlines before generating full content.
+* **Granular Editorial Controls**: Tailor tone (*Professional, Conversational, Technical, Academic, Persuasive*), length (*Short, Medium, Long*), and target audience profiles.
+* **Section-by-Section Rewriting**: Refine individual subsections without regenerating the entire document.
+
+---
+
+### 2. 🤖 Pilot — Autonomous AI Editorial Agent
+* **Multi-Step Tool Orchestration**: Plans and executes multi-phase tasks from natural language prompts with real-time per-step status execution cards.
+* **Autonomous Toolkit**:
+  * ✍️ **Intelligent Editing**: Applies surgical stylistic and factual revisions.
+  * 🎯 **SEO Optimization**: Computes Flesch readability, keyword density, and heading hierarchy, then applies one-click structural fixes.
+  * 🔍 **Competitor SERP Analysis**: Scans search competitor structures to identify content gaps and missing subtopics.
+  * 🌐 **Multilingual Translation**: Preserves formatting and nuances across any target language.
+  * 🖼️ **Media Synthesis**: Coordinates cover art and section image creation.
+* **Dual Chat Architecture**:
+  * **Article Chat**: Context-scoped task assistant for current draft editing.
+  * **Library Chat (RAG)**: Cross-library question-answering powered by vector embeddings and citation links.
+
+---
+
+### 3. 🎨 Visual Media & Image Engine
+* **Context-Aware Visual Generation**: Produces tailored cover art and per-section illustrations using FLUX.1 / Cloudflare Workers AI / Pollinations.
+* **Persistent Cloud Storage**: Automatically stores media in Supabase Storage buckets, ensuring assets survive redeployments and render reliably.
+* **Real-Time Visual Feedback**: Live animated generation banners and responsive loading indicators keep users informed throughout the generation lifecycle.
+
+---
+
+### 4. 📊 Keyword Intelligence & Dashboard Analytics
+* **Balanced Content Distribution Matrix**: 3-column breakdown visualizing audience distribution, tone preferences, and length distributions without layout distortion.
+* **Dual-Mode Keyword Hub**:
+  * 🏷️ **Tag Cloud View**: Compact, interactive chips with medal highlights (🥇, 🥈, 🥉) for top-performing topics.
+  * 📊 **Ranked Leaderboard**: Complete ranking table with percentage shares, visual frequency progress bars, and one-click copy actions.
+* **Productivity Metrics**: Tracks 30-day activity timelines, word counts, reading time estimates, and week-over-week trends.
+
+<p align="center">
+  <img src="./assets/screenshots/dashboard_preview.svg" alt="ContentPilot Dashboard and Keyword Intelligence" width="100%" />
+</p>
+
+---
+
+### 5. 🔁 Omnichannel Repurposing & Multi-Format Export
+* **X (Twitter) Threads**: Converts long-form articles into high-engagement thread posts with hook lines and structured points.
+* **LinkedIn Thought-Leadership**: Formats ready-to-paste posts optimized for professional networks.
+* **Email Newsletters**: Generates structured newsletters complete with subject lines, previews, highlight bullets, and call-to-actions.
+* **FAQ Accordions**: Automatically extracts question-and-answer pairs for search snippet optimization.
+* **Multi-Format Export**: One-click downloads as `.md`, `.html`, or printable `.pdf`.
+
+---
+
+### 6. 🎨 Dynamic Theme Customization
+* 8 handcrafted visual themes:
+  * 🌌 **Midnight** (Sleek Dark Glassmorphism)
+  * 🌊 **Ocean** (Deep Teal/Cyan)
+  * 🌲 **Forest** (Emerald Green)
+  * 🌇 **Sunset** (Vibrant Amber/Orange)
+  * 🌸 **Rose** (Modern Pink/Fuchsia)
+  * ❄️ **Nord** (Arctic Slate Blue)
+  * ⚪ **Daylight** (Clean Minimal Light)
+  * 📓 **Mono** (High-Contrast Monochrome)
+
+---
+
+## 🏛️ System Architecture
+
+```mermaid
+graph TD
+    subgraph Frontend ["Frontend (React 18 + Vite)"]
+        UI[App / Generator Page]
+        AgentUI[Pilot AI Agent Interface]
+        DashUI[Dashboard & Keyword Hub]
+        LibUI[Library & RAG Chat]
+    end
+
+    subgraph Backend ["Backend API (FastAPI + SQLModel)"]
+        Router[FastAPI Route Handlers]
+        GenService[Generation & Prompt Service]
+        RAGService[RAG & Embedding Engine]
+        StorageService[Supabase Storage Service]
+        StatsService[Analytics Aggregator]
+    end
+
+    subgraph AI_Layer ["AI & Cloud Providers"]
+        Groq[Groq LLaMA 3.3 70B - Primary Text]
+        Gemini[Google Gemini 2.5 Flash - Grounding & Fallback]
+        GeminiEmbed[Gemini Embeddings - RAG]
+        Flux[Cloudflare / FLUX.1 - Image Synthesis]
+    end
+
+    subgraph Persistence ["Data & Cloud Storage"]
+        Postgres[(Neon PostgreSQL - Articles & Chats)]
+        Supabase[(Supabase Storage - Public Media Bucket)]
+    end
+
+    UI --> Router
+    AgentUI --> Router
+    DashUI --> Router
+    LibUI --> Router
+
+    Router --> GenService
+    Router --> RAGService
+    Router --> StorageService
+    Router --> StatsService
+
+    GenService --> Groq
+    GenService --> Gemini
+    GenService --> Flux
+    RAGService --> GeminiEmbed
+
+    StorageService --> Supabase
+    StatsService --> Postgres
+    Router --> Postgres
+```
+
+---
+
+## 📦 Project Structure
 
 ```
-main/
+ContentPilot/
 ├── backend/
 │   ├── app/
-│   │   ├── main.py              # FastAPI app, generation + agent routes, scheduler
-│   │   ├── config.py            # env-based settings
-│   │   ├── db.py                # engine, session, lightweight migrations
-│   │   ├── models.py            # SQLModel tables (Article, ChatSession, …)
-│   │   ├── schemas.py           # request/response models
-│   │   ├── auth.py              # Clerk JWT verification (+ local fallback)
+│   │   ├── main.py              # FastAPI application entry & route bindings
+│   │   ├── config.py            # Application configuration & environment mappings
+│   │   ├── db.py                # Database connection & SQLModel session engine
+│   │   ├── models.py            # Database schemas (Article, ChatSession, Embedding)
+│   │   ├── schemas.py           # Pydantic request & response models
+│   │   ├── auth.py              # Authentication handler & token verification
 │   │   ├── routers/
-│   │   │   ├── articles.py      # saved-article CRUD
-│   │   │   ├── stats.py         # dashboard analytics
-│   │   │   ├── library.py       # RAG "chat with your library"
-│   │   │   ├── chat.py          # persisted chat sessions (history)
-│   │   │   └── notify.py        # email digest + subscription + scheduler job
+│   │   │   ├── articles.py      # Article lifecycle CRUD operations
+│   │   │   ├── stats.py         # Dashboard analytics & distribution metrics
+│   │   │   ├── library.py       # Semantic RAG library search & QA
+│   │   │   ├── chat.py          # Multi-session chat persistence
+│   │   │   └── notify.py        # Email digests & subscriptions
 │   │   └── services/
-│   │       ├── generator.py     # LLM chain, embeddings, agent planner
-│   │       └── mailer.py        # Resend (HTTP) + SMTP sender
+│   │       ├── generator.py     # LLM orchestration, RAG embeddings, & agent planner
+│   │       ├── storage.py       # Supabase image upload & public URL resolution
+│   │       └── mailer.py        # Email dispatch service
 │   └── requirements.txt
-└── frontend/
-    ├── src/
-    │   ├── App.jsx              # generator page
-    │   ├── Layout.jsx           # nav + theme switcher + auth gate
-    │   ├── AgentContext.jsx     # cross-tab chat/session state
-    │   ├── AuthGate.jsx         # Clerk wrapper (+ local mode)
-    │   ├── theme.js / ThemeSwitcher.jsx
-    │   ├── pages/
-    │   │   ├── Library.jsx
-    │   │   ├── Dashboard.jsx
-    │   │   └── Agent.jsx        # Pilot: Article + Library chat, history drawer
-    │   ├── api.js               # backend client
-    │   └── styles.css
-    ├── index.html
-    ├── package.json
-    └── vite.config.js
+├── frontend/
+│   ├── src/
+│   │   ├── App.jsx              # Core Generator & Editor interface
+│   │   ├── Layout.jsx           # Global navigation & theme switcher
+│   │   ├── AuthGate.jsx         # User authentication gate & session context
+│   │   ├── pages/
+│   │   │   ├── Dashboard.jsx    # Metrics, 3-column distributions & Keyword Intelligence
+│   │   │   ├── Agent.jsx        # Pilot AI Agent & Multi-Session workspace
+│   │   │   └── Library.jsx      # Article repository & archive
+│   │   ├── api.js               # Frontend API client
+│   │   └── styles.css           # Design tokens, themes, & glassmorphism system
+│   ├── index.html
+│   ├── vite.config.js
+│   └── package.json
+└── assets/
+    └── screenshots/             # Visual previews, diagrams, and media assets
 ```
 
 ---
 
-## 1. Run the backend
+## 📊 Core Data Entities
 
-```powershell
-cd backend
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-pip install -r requirements.txt
-# create backend/.env (see "Environment variables" below)
-uvicorn app.main:app --reload
-```
-
-Backend runs at **http://localhost:8000** (interactive docs at `/docs`).
-
-At minimum you need **one LLM key** (Groq or Gemini). Everything else (Postgres, Clerk,
-email) is optional and has sensible local defaults.
+| Model | Description | Key Fields |
+| :--- | :--- | :--- |
+| **`Article`** | Core content records generated by users | `id`, `user_id`, `title`, `topic`, `markdown`, `cover_url`, `word_count`, `keywords`, `tone`, `length`, `audience` |
+| **`ChatSession`** | Multi-turn AI Agent dialogues & session history | `id`, `user_id`, `article_id`, `mode` (*article / library*), `title`, `messages` |
+| **`Embedding`** | Precomputed semantic vectors for RAG querying | `id`, `article_id`, `chunk_index`, `vector`, `updated_at` |
+| **`Subscription`** | Digest delivery preferences & schedules | `id`, `user_id`, `email`, `enabled`, `send_day`, `send_hour`, `timezone` |
 
 ---
 
-## 2. Run the frontend
-
-In a second terminal:
-
-```powershell
-cd frontend
-npm install
-npm run dev
-```
-
-Open **http://localhost:5173**. The Vite dev server proxies `/api` calls to the backend.
-
----
-
-## Environment variables
-
-Create `backend/.env`. Only the LLM key is required to start.
-
-```ini
-# --- LLM providers (at least one) -------------------------------------------
-GROQ_API_KEY=            # primary text provider — https://console.groq.com/keys
-GROQ_MODEL=llama-3.3-70b-versatile
-GEMINI_API_KEY=          # fallback + embeddings + images — https://aistudio.google.com/apikey
-GEMINI_MODEL=gemini-2.5-flash          # use a "flash" model (pro = 0 free quota)
-GEMINI_EMBEDDING_MODEL=gemini-embedding-001   # used for library RAG search
-
-# --- Images -----------------------------------------------------------------
-IMAGE_PROVIDER=pollinations            # "pollinations" (free) | "cloudflare" (free FLUX) | "gemini"
-POLLINATIONS_MODEL=flux
-POLLINATIONS_ENHANCE=true               # LLM prompt enhancer — sharper, on-topic images (free)
-POLLINATIONS_TOKEN=                     # optional, unlocks better models (e.g. gptimage)
-# Cloudflare Workers AI — best free quality (FLUX.1-schnell). Free token + account id at
-# dash.cloudflare.com → Workers AI. Set IMAGE_PROVIDER=cloudflare to use it.
-CLOUDFLARE_ACCOUNT_ID=                   # your Cloudflare account id
-CLOUDFLARE_API_TOKEN=                    # Workers AI token
-CLOUDFLARE_IMAGE_MODEL=@cf/black-forest-labs/flux-1-schnell
-CLOUDFLARE_IMAGE_STEPS=8                 # 1–8; higher = more detail
-
-# --- Image storage (Supabase Storage) ---------------------------------------
-# Generated images are uploaded to Supabase Storage and served from its public
-# URL, so they survive redeploys and work on serverless hosts (Vercel). No card
-# required. At supabase.com: create a project, add a PUBLIC bucket named "images",
-# then grab the URL + service_role key from Project Settings → API.
-SUPABASE_URL=                            # e.g. https://xxxxxxxx.supabase.co
-SUPABASE_SERVICE_KEY=                    # service_role key (keep secret, server-side only)
-SUPABASE_BUCKET=images
-
-# --- Database (required — Neon/Postgres, no SQLite) --------------------------
-# Paste your Neon connection string — a raw postgresql:// URL is auto-upgraded
-# to the psycopg driver.
-DATABASE_URL=postgresql://user:pass@ep-xxx.neon.tech/neondb?sslmode=require
-
-# --- Auth (optional; omit for single-user "local" mode) ---------------------
-CLERK_PUBLISHABLE_KEY=
-CLERK_SECRET_KEY=
-
-# --- Email (optional) -------------------------------------------------------
-# PREFERRED: Resend HTTP API — works on any host (sends over HTTPS, never blocked
-# like SMTP ports). Free key at resend.com. RESEND_FROM needs a verified domain,
-# or use onboarding@resend.dev to test against your own account email.
-RESEND_API_KEY=
-RESEND_FROM=ContentPilot <onboarding@resend.dev>
-# FALLBACK: raw SMTP (used only when RESEND_API_KEY is empty). Good for local dev.
-# Many hosts block outbound SMTP, so prefer Resend in production.
-SMTP_HOST=                # e.g. smtp.gmail.com (use an App Password)
-SMTP_PORT=587
-SMTP_USER=
-SMTP_PASSWORD=
-SMTP_FROM=                # defaults to SMTP_USER
-SMTP_FROM_NAME=ContentPilot
-SMTP_USE_TLS=true
-APP_BASE_URL=http://localhost:5173     # used in email links (set to your live URL on deploy)
-API_BASE_URL=http://localhost:8000     # used for one-click unsubscribe links
-
-ALLOWED_ORIGINS=http://localhost:5173,http://127.0.0.1:5173
-```
-
-For the frontend, to enable Clerk auth create `frontend/.env`:
-
-```ini
-VITE_CLERK_PUBLISHABLE_KEY=pk_test_...
-```
-
-Without it, the app runs in single‑user local mode (no sign‑in required).
-
-> Restart the backend after editing `.env` — settings load at startup and `--reload`
-> only watches `.py` files.
-
----
-
-## API overview
-
-Full interactive docs at **http://localhost:8000/docs**. Highlights:
-
-| Area | Endpoints |
-|------|-----------|
-| Generate | `POST /api/generate`, `/api/generate/stream`, `/api/generate/grounded[/stream]`, `/api/outline`, `/api/rewrite` |
-| Enhance | `/api/seo/improve`, `/api/translate`, `/api/faq`, `/api/social`, `/api/competitors`, `/api/articles/{id}/cover`, `/api/articles/{id}/section-images` |
-| Agent | `POST /api/edit/chat`, `POST /api/agent/plan` |
-| Library | `GET/POST/PUT/DELETE /api/articles`, `POST /api/library/ask` (RAG) |
-| Chat history | `GET/POST/PUT/PATCH/DELETE /api/chat/sessions` |
-| Analytics | `GET /api/stats` |
-| Email | `/api/notify/status`, `/api/notify/test`, `/api/notify/digest`, `/api/notify/subscription`, `/api/notify/unsubscribe` |
-| Health | `GET /api/health` |
-
-Example — `POST /api/generate`:
-
-```json
-{
-  "topic": "Benefits of remote work",
-  "keywords": ["remote work", "productivity"],
-  "tone": "informative",
-  "length": "medium",
-  "audience": "startup founders"
-}
-```
-
----
-
-## Architecture notes
-
-- **Provider chain:** text generation tries **Groq** first, falls back to **Gemini**.
-  Web grounding and images use Gemini/Pollinations (Groq supports neither). Embeddings
-  for RAG use Gemini `gemini-embedding-001`.
-- **RAG:** article embeddings are cached in a separate table and computed lazily (only for
-  new/edited articles). Similarity search runs in Python — fine for a personal library;
-  swap in pgvector for large scale.
-- **Chat history:** each mode + article is an independent set of sessions stored as JSON
-  blobs (`ChatSession`), so rich message shapes (tool steps, sources) round‑trip intact.
-- **Scheduler:** an in‑process APScheduler job runs hourly and emails subscribers whose
-  chosen local day + hour is due. It only fires while the backend is running — deploy the
-  backend somewhere always‑on for reliable delivery.
-
----
-
-## Notes
-
-- Use a Gemini **flash** model — `-pro` models have 0 free‑tier quota and 429 on the first
-  request.
-- Never commit `.env`. Type secrets (API keys, SMTP app passwords) directly into the file.
+<p align="center">
+  <b>ContentPilot</b> — Crafted for creators, engineers, and digital publishers.
+</p>
