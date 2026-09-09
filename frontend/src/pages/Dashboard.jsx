@@ -123,15 +123,23 @@ function ActivityChart({ points }) {
   );
 }
 
-function DistributionPanel({ title, items, emptyText }) {
+function DistributionPanel({ icon, title, items, emptyText }) {
   const total = useMemo(
     () => items.reduce((sum, it) => sum + it.count, 0),
     [items]
   );
   return (
-    <div className="dash-panel card">
+    <div className="dash-panel card dash-dist-card">
       <div className="dash-panel-head">
-        <h2>{title}</h2>
+        <div className="dash-panel-title-group">
+          {icon && <span className="dash-panel-icon">{icon}</span>}
+          <h2>{title}</h2>
+        </div>
+        {items.length > 0 && (
+          <span className="dash-badge-pill">
+            {items.length} {items.length === 1 ? "type" : "types"}
+          </span>
+        )}
       </div>
       {items.length === 0 ? (
         <p className="dash-empty">{emptyText}</p>
@@ -165,35 +173,171 @@ function DistributionPanel({ title, items, emptyText }) {
   );
 }
 
-function KeywordCloud({ items }) {
+function KeywordIntelligence({ items }) {
+  const [viewMode, setViewMode] = useState("cloud"); // "cloud" | "table"
+  const [search, setSearch] = useState("");
+  const [copiedKw, setCopiedKw] = useState("");
+
   const maxCount = useMemo(
     () => Math.max(1, ...items.map((it) => it.count)),
     [items]
   );
+
+  const totalOccurrences = useMemo(
+    () => items.reduce((sum, it) => sum + it.count, 0),
+    [items]
+  );
+
+  const filtered = useMemo(() => {
+    if (!search.trim()) return items;
+    const q = search.trim().toLowerCase();
+    return items.filter((it) => it.name.toLowerCase().includes(q));
+  }, [items, search]);
+
+  const handleCopy = (e, name) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(name);
+    setCopiedKw(name);
+    setTimeout(() => setCopiedKw(""), 1600);
+  };
+
   return (
-    <div className="dash-panel card">
-      <div className="dash-panel-head">
-        <h2>Top keywords</h2>
+    <div className="dash-panel card dash-keywords-panel">
+      <div className="dash-panel-head dash-keywords-head">
+        <div>
+          <div className="dash-panel-title-group">
+            <span className="dash-panel-icon">🏷️</span>
+            <h2>Keyword Intelligence</h2>
+            {items.length > 0 && (
+              <span className="dash-badge-pill">{items.length} tracked</span>
+            )}
+          </div>
+          <p className="dash-panel-sub">
+            Search phrases & concepts discovered across your generated articles
+          </p>
+        </div>
+
+        <div className="dash-keywords-controls">
+          {items.length > 4 && (
+            <div className="dash-search-box">
+              <span className="dash-search-icon" aria-hidden="true">🔍</span>
+              <input
+                type="text"
+                placeholder="Filter keywords…"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="dash-search-input"
+              />
+              {search && (
+                <button
+                  type="button"
+                  className="dash-search-clear"
+                  onClick={() => setSearch("")}
+                  aria-label="Clear search"
+                >
+                  ×
+                </button>
+              )}
+            </div>
+          )}
+
+          <div className="dash-view-toggle">
+            <button
+              type="button"
+              className={`dash-view-btn ${viewMode === "cloud" ? "active" : ""}`}
+              onClick={() => setViewMode("cloud")}
+              title="Cloud View"
+            >
+              🏷️ Cloud
+            </button>
+            <button
+              type="button"
+              className={`dash-view-btn ${viewMode === "table" ? "active" : ""}`}
+              onClick={() => setViewMode("table")}
+              title="Ranked Leaderboard"
+            >
+              📊 Ranked
+            </button>
+          </div>
+        </div>
       </div>
+
       {items.length === 0 ? (
         <p className="dash-empty">
           No keywords yet. Add keywords when generating to see them here.
         </p>
-      ) : (
+      ) : filtered.length === 0 ? (
+        <p className="dash-empty">No keywords matching "{search}".</p>
+      ) : viewMode === "cloud" ? (
         <div className="dash-cloud">
-          {items.map((it) => {
-            // Scale font size 0.85rem → 1.6rem by frequency.
-            const scale = 0.85 + (it.count / maxCount) * 0.75;
+          {filtered.map((it, idx) => {
+            const isTop = idx < 3 && !search;
+            const rankIcon = idx === 0 ? "🥇" : idx === 1 ? "🥈" : idx === 2 ? "🥉" : null;
             return (
-              <span
+              <div
                 key={it.name}
-                className="dash-cloud-tag"
-                style={{ fontSize: `${scale}rem` }}
-                title={`${it.count} article${it.count === 1 ? "" : "s"}`}
+                className={`dash-cloud-tag ${isTop ? "dash-cloud-top" : ""}`}
+                title={`Used in ${it.count} article${it.count === 1 ? "" : "s"}. Click to copy.`}
+                onClick={(e) => handleCopy(e, it.name)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => e.key === "Enter" && handleCopy(e, it.name)}
               >
-                {it.name}
+                {rankIcon && <span className="dash-tag-medal">{rankIcon}</span>}
+                <span className="dash-tag-text">{it.name}</span>
                 <span className="dash-cloud-count">{it.count}</span>
-              </span>
+                <span className="dash-tag-copy-indicator" aria-hidden="true">
+                  {copiedKw === it.name ? "✓" : "📋"}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      ) : (
+        <div className="dash-ranked-grid">
+          {filtered.map((it, idx) => {
+            const rank = idx + 1;
+            const pct = totalOccurrences ? Math.round((it.count / totalOccurrences) * 100) : 0;
+            return (
+              <div key={it.name} className="dash-ranked-row">
+                <div className="dash-ranked-rank">
+                  <span className={`dash-rank-badge ${rank <= 3 ? `rank-${rank}` : ""}`}>
+                    #{rank}
+                  </span>
+                </div>
+                <div className="dash-ranked-info">
+                  <div className="dash-ranked-title-row">
+                    <span className="dash-ranked-name">{it.name}</span>
+                    <span className="dash-ranked-stats">
+                      {it.count} {it.count === 1 ? "article" : "articles"} · {pct}% share
+                    </span>
+                  </div>
+                  <div className="dash-dist-track">
+                    <div
+                      className="dash-dist-fill"
+                      style={{
+                        width: `${Math.max(8, (it.count / maxCount) * 100)}%`,
+                        background:
+                          rank === 1
+                            ? "linear-gradient(90deg, #f59e0b, #fbbf24)"
+                            : rank === 2
+                            ? "linear-gradient(90deg, #94a3b8, #cbd5e1)"
+                            : rank === 3
+                            ? "linear-gradient(90deg, #d97706, #f97316)"
+                            : "linear-gradient(90deg, var(--accent), var(--accent-2))",
+                      }}
+                    />
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  className="dash-ranked-copy"
+                  title="Copy keyword"
+                  onClick={(e) => handleCopy(e, it.name)}
+                >
+                  {copiedKw === it.name ? "✓ Copied" : "📋 Copy"}
+                </button>
+              </div>
             );
           })}
         </div>
@@ -581,27 +725,28 @@ export default function Dashboard() {
 
           <ActivityChart points={stats.over_time || []} />
 
-          <section className="dash-two-col">
+          <section className="dash-three-col">
             <DistributionPanel
+              icon="🎯"
               title="Audiences"
               items={stats.audiences || []}
               emptyText="No audience data."
             />
             <DistributionPanel
+              icon="🎭"
               title="Tones"
               items={stats.tones || []}
               emptyText="No tone data."
             />
-          </section>
-
-          <section className="dash-two-col">
             <DistributionPanel
+              icon="📏"
               title="Lengths"
               items={stats.lengths || []}
               emptyText="No length data."
             />
-            <KeywordCloud items={stats.top_keywords || []} />
           </section>
+
+          <KeywordIntelligence items={stats.top_keywords || []} />
         </>
       )}
     </main>
